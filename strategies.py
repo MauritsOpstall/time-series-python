@@ -42,3 +42,27 @@ def momentum(prices, lookback):
 
     return results.astype(int)
 
+def rsi(prices, n):
+    """
+    Relative Strength Index (RSI) Strategy.
+
+    Parameters:
+    - prices: A pandas Series of stock prices.
+    - n: The number of periods to use for RSI calculation.
+
+    Returns:
+    - A pandas Series of RSI values.
+    """
+    delta = prices.diff()
+    
+    gain = delta.where(delta > 0, 0)
+    loss = -delta.where(delta < 0, 0)
+
+
+    avg_gain = gain.ewm(alpha=1/n, adjust=False).mean()
+    avg_loss = loss.ewm(alpha=1/n, adjust=False).mean()
+
+    rs_t = avg_gain / avg_loss
+    rsi_t = 100 - (100 / (1 + rs_t))
+
+    return rsi_t
